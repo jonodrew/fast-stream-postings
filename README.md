@@ -1,1 +1,1 @@
-# fast-stream-postings
+# Submit a Fast Stream Post
