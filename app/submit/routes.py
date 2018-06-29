@@ -33,11 +33,11 @@ def role_details():
     if request.method == 'POST':
         print(request.form)
         print(request.form['email'])
-        session[1] = request.form
+        redis.set('role details', request.form)
     return render_template('submit/role-details.html', title='Role details', question=question)
 
 
 @bp.route('/confirm-role-details', methods=['GET', 'POST'])
 def confirm_role_details():
-    data = request.form
+    data = redis.get('role details')
     return render_template('submit/confirm-role-details.html', data=data)
