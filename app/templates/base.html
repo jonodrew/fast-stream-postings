@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" class="govuk-template app-html-class">
+  <head>
+    <meta charset="utf-8" />
+    <title>Submit a Fast Stream role - GOV.UK</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="blue" />
+      <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/x-icon" />
+      <link rel="mask-icon" href="{{ url_for('static', filename="images/govuk-mask-icon.svg") }}" color="blue">
+      <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename="images/govuk-apple-touch-icon-180x180.png") }}">
+      <link rel="apple-touch-icon" sizes="167x167" href="{{ url_for('static', filename="images/govuk-apple-touch-icon-167x167.png") }}">
+      <link rel="apple-touch-icon" sizes="152x152" href="{{ url_for('static', filename="images/govuk-apple-touch-icon-152x152.png") }}">
+      <link rel="apple-touch-icon" href="{{ url_for('static', filename="images/govuk-apple-touch-icon.png") }}">
+
+
+  <meta name="robots" content="noindex, nofollow">
+  <!--[if !IE 8]><!-->
+    <link href="{{ url_for('static', filename='css/all.css') }}" rel="stylesheet" media="all" />
+  <!--<![endif]-->
+  <!--[if lt IE 9]>
+    <link href="/stylesheets/main-ie8-93477b02ea3d2d6b02a1992d8b09c27f.css" rel="stylesheet" media="all" />
+    <script src="/javascripts/ie-a8e7778041ff37c18b1dc480185bfa3f.js"></script>
+  <![endif]-->
+  <!--<script src="/javascripts/vendor/modernizr.js"></script>-->
+
+
+    <meta property="og:image" content="/images/govuk-opengraph-image.png">
+  </head>
+  <body class="govuk-template__body app-body-class">
+    <script>document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');</script>
+
+  <a href="#main-content" class="govuk-skip-link">Passer au contenu principal</a>
+
+
+{% include '_header.html' %}
+
+        <div class="govuk-width-container">
+        {% include '_phase-banner.html' %}
+        <a href="#" class="govuk-back-link">Back</a>
+        {% block content %}
+        
+        {% endblock %}
+
+      </div>
+
+    {% include '_footer.html' %}
+
+
+  <script src="{{ url_for('static', filename="javascript/govuk-frontend-1.0.0.min.js") }}"></script>
+  <script>window.GOVUKFrontend.initAll()</script>
+  </body>
+</html>
