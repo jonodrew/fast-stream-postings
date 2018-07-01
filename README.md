@@ -1,6 +1,6 @@
 # Submit a Fast Stream Post
 
-##Build
+## Build
 This service is built in Flask. It uses a Docker container. 
 Before you start, you'll need a database and a way for the container to access it. In Flask, this is done by setting 
 the environment variable `DATABASE_URL`. If you don't set it, the container will look for a locally hosted database,
