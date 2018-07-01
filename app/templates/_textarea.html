@@ -1,6 +1,6 @@
 <div class="govuk-form-group">
     {% if question.textarea.label %}
-         <label class="govuk-label" for="more-detail">
+         <label class="govuk-label" for="{{ question.textarea.for }}">
     {{ question.textarea.label}}
   </label>
     {% endif %}
@@ -8,5 +8,6 @@
   <span id="more-detail-hint" class="govuk-hint">
     {{ question.textarea.hint }}
   </span>
-  <textarea class="govuk-textarea" id="more-detail" name="more-detail" rows="5" aria-describedby="more-detail-hint"></textarea>
+  <textarea class="govuk-textarea" id="{{ question.textarea.for }}" name="{{ question.textarea.for }}" rows="5"
+            aria-describedby="more-detail-hint"></textarea>
 </div>

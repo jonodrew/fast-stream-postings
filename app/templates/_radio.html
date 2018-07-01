@@ -4,6 +4,7 @@
     </legend>
     <div class="govuk-radios">
         {% for label, value in question.radio['values'].items()  %}
+            {% set i = loop.index %}
             {% include '_radio_input.html' %}
         {% endfor %}
     </div>
