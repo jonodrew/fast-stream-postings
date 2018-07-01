@@ -11,5 +11,5 @@ the folder and run the following command:
 `docker-compose up`
 
 This will pull down any Docker images you don't have, so it may take a little while. Once it's finished, it'll launch 
-the three containers. You should not be able to open your browser, navigate to `localhost:5000/submit/start` and see the 
+the three containers. You should now be able to open your browser, navigate to `localhost:5000/submit/start` and see the 
 service running.  
