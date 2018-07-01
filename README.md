@@ -1,15 +1,15 @@
 # Submit a Fast Stream Post
 
 ## Build
-This service is built in Flask. It uses a Docker container. 
-Before you start, you'll need a database and a way for the container to access it. In Flask, this is done by setting 
-the environment variable `DATABASE_URL`. If you don't set it, the container will look for a locally hosted database,
-which it won't find.
+This service is built in Flask. It comprises three containers: a Redis container for storing session data, a Postgres 
+container for persisting data, and a Python container to run the Flask web server. 
 
-This can be done by creating a database container or by using a cloud-based database. I used Heroku, because I was 
-planning to deploy the prototype there anyway.
+To run this locally for yourself, you'll need to install [Docker Compose](https://docs.docker.com/compose/install/).
 
-Therefore to build this service you'll need:
+Once you've install that (and Docker, if you didn't already have it), clone this repo with `git clone`. Then `cd` into 
+the folder and run the following command:
+`docker-compose up`
 
-- a database
-- Docker installed on your local machine 
+This will pull down any Docker images you don't have, so it may take a little while. Once it's finished, it'll launch 
+the three containers. You should not be able to open your browser, navigate to `localhost:5000/submit/start` and see the 
+service running.  
