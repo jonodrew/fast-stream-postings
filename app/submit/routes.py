@@ -79,7 +79,7 @@ def contact_details():
         redis.set('logistical details', request.form)
     question = {'name': {'for': 'activity-manager-name',
                          'label': 'Please give the activity manager\'s email address',
-                         'hint': ''},
+                         'hint': "We'll email a copy of this completed form to that address"},
                 'location': {'for': 'activity-manager-location',
                              'label': 'Please give an address for this role',
                              'hint': 'Please include a postcode. We generally find that Activity Managers who are local'
