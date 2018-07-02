@@ -5,7 +5,7 @@
   </label>
     {% endif %}
 
-  <span id="more-detail-hint" class="govuk-hint">
+  <span id="{{ question_data.for }}-hint" class="govuk-hint">
     {{ question_data.hint }}
   </span>
   <textarea class="govuk-textarea" id="{{ question_data.for }}" name="{{ question_data.for }}" rows="5"

@@ -1,7 +1,7 @@
 <div class="govuk-radios__item">
-<input class="govuk-radios__input" id="{{ question.for }}-{{ i }}" name="{{ question.name }}" type="radio"
+<input class="govuk-radios__input" id={{ question_data.name ~ i }} name="{{ question_data.name }}" type="radio"
        value={{ value }}>
-<label class="govuk-label govuk-radios__label" for="{{ question.for }}-{{ i }}">
+<label class="govuk-label govuk-radios__label" for={{ question_data.name ~ i }}>
 {{label}}
 </label>
 </div>
