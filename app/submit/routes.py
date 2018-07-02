@@ -75,10 +75,28 @@ def logistical_details():
 
 @bp.route('/contact-details', methods=['GET', 'POST'])
 def contact_details():
-    pass
+    if request.method == 'POST':
+        redis.set('logistical details', request.form)
+    question = {'name': {'for': 'activity-manager-name',
+                         'label': 'Please give the activity manager\'s email address',
+                         'hint': ''},
+                'location': {'for': 'activity-manager-location',
+                             'label': 'Please give an address for this role',
+                             'hint': 'Please include a postcode. We generally find that Activity Managers who are local'
+                                     'to their Fast Streamer get greater benefit. '},
+                'grade': {'for': 'activity-manager-grade',
+                          'label': 'What grade will the Fast Streamer\'s Activity Manager hold?',
+                          'hint': 'In general we expect this to be a Grade 7 or equivalent for 6 month posts and a '
+                                  'Grade 6 or equivalent for 12 month posts'}
+                }
+    return render_template('submit/contact-details.html', question=question)
 
 
 @bp.route('/confirm-role-details', methods=['GET', 'POST'])
 def confirm_role_details():
-    data = redis.get('role details')
+    data = {
+        'role details': redis.get('role details'),
+        'logistics': redis.get('logistical details'),
+        'contact': request.form
+    }
     return render_template('submit/confirm-role-details.html', data=data)
