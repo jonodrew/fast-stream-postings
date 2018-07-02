@@ -11,8 +11,42 @@ def start():
     return render_template('submit/start.html', title='Submit a Fast Stream role')
 
 
+@bp.route('/role-family', methods=['POST', 'GET'])
+def role_family():
+    question = {
+        'family': {
+            'heading': 'In which job family does this role sit?',
+            'name': 'ddat-job-family',
+            'values': {'Data': 'data',
+                      'IT Operations': 'ITOps',
+                      'Product and delivery': 'PD',
+                      'Quality Assurance Testing': 'QAT',
+                      'Technical': 'technical',
+                      'User-centred design': 'UCD'},
+            'for': 'ddat_job_family'
+        }
+    }
+    return render_template('submit/role-family.html', question=question)
+
+
 @bp.route('/role-details', methods=['GET', 'POST'])
 def role_details():
+    roles = {
+        'data': {
+            'Data engineer': 'data_engineer',
+            'Data scientist': 'data_scientist',
+            'Performance analyst': 'performance_analyst'
+        }
+    }
+    job_roles = {
+        'heading': 'Please select the role title',
+        'name': 'role-title',
+        'values': {},
+        'for': 'role_title'
+    }
+    if request.method == 'POST':
+        json_data = request.form
+        job_roles['values'] = roles[json_data['ddat-job-family']]
     question = {'textarea': {'label': 'Role description',
                              'hint': "Please give a description of the role and some context. For example, what "
                                      "are the team's priorities?",
@@ -36,13 +70,23 @@ def role_details():
                                      'label': 'Main responsibilities and deliverables of post',
                                      'hint': "We'll use this to decide if the role has sufficient stretch"}
                 }
-    return render_template('submit/role-details.html', title='Role details', question=question)
+    return render_template('submit/role-details.html', title='Role details', question=question, job_roles=job_roles)
+
+
+@bp.route('/role-specifics', methods=['POST', 'GET'])
+def role_specifics():
+    if request.method == 'POST':
+        redis.set('role details', request.form)
+    question = {
+        'data': ['Data engineer']
+    }
+    return render_template('submit/role-specifics.html', question=question)
 
 
 @bp.route('/logistical-details', methods=['POST', 'GET'])
 def logistical_details():
     if request.method == 'POST':
-        redis.set('role details', request.form)
+        redis.set('role specifics', request.form)
     question = {'department': {'for': 'department',
                                'label': 'What department or agency is this role in?',
                                'hint': "What's your organisation generally known as?"},

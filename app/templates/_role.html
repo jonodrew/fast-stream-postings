@@ -1,13 +1,29 @@
-UID: {{ role.id }}<br>
-Organisation: {{ role.organisation.name }}<br>
-Specialism: {{ role.specialism.name }}<br>
-Location: {{ role.region.name }}<br>
-This role is {% if role.private_office == false %}not{% endif %} a private office role<br>
-This role offers the following skills:
-<ul>
-    {% for skill in role.wanted_skills() %}
-        <li>{{ skill }}</li>
-    {% endfor %}
-
-</ul>
-<hr>
+<div class="govuk-form-group">
+    <fieldset class="govuk-fieldset">
+        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+            {{ question_data.heading }}
+        </legend>
+        <div class="govuk-radios" data-module="radios">
+            {% for label, value in question_data['values'].items()  %}
+                {% set i = loop.index %}
+                {% include '_radio_input.html' %}
+            {% endfor %}
+            {% set i = question_data['values']|length + 1%}
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input" id={{ question_data.name ~ i }} name={{ question_data.name }} type="radio"
+                   value="Other" data-aria-controls="conditional-{{ question_data.name ~ i }}">
+            <label class="govuk-label govuk-radios__label" for={{ question_data.name ~ i }}>
+                Other role title
+            </label>
+          </div>
+          <div class="govuk-radios__conditional" id="conditional-{{ question_data.name ~ i }}">
+            <div class="govuk-form-group">
+              <label class="govuk-label" for="other-role-title">
+                What's this role called?
+              </label>
+              <input class="govuk-input govuk-!-width-one-third" id="other-role-title" name="other-role-title" type="text">
+            </div>
+          </div>
+        </div>
+    </fieldset>
+</div>
