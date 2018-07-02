@@ -1,11 +1,11 @@
 <div class="govuk-form-group">
-  <label class="govuk-label" for="{{ question.text_input.for }}">
-    {{ question.text_input.label }}
+  <label class="govuk-label" for="{{ question_data.for }}">
+    {{ question_data.label }}
   </label>
-  <span id="{{ question.text_input.for }}-hint" class="govuk-hint">
-      {{ question.text_input.hint | safe}}
+  <span id="{{ question_data.for }}-hint" class="govuk-hint">
+      {{ question_data.hint | safe}}
   </a>
   </span>
-  <input class="govuk-input" id="{{ question.text_input.for }}" name="{{ question.text_input.for }}" type="text"
-         aria-describedby="{{ question.text_input.for }}-hint">
+  <input class="govuk-input" id="{{ question_data.for }}" name="{{ question_data.for }}" type="text"
+         aria-describedby="{{ question_data.for }}-hint">
 </div>

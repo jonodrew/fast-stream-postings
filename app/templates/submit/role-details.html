@@ -9,10 +9,14 @@
 
         <form action="{{ url_for('submit.confirm_role_details') }}" method="post">
     <div class="govuk-form-group">
+        {% set question_data = question.text_input %}
          {% include '_text_input.html' %}
+        {% set question_data = question.textarea %}
     {% include '_textarea.html' %}
+        {% set question_data = question.responsibilities %}
+        {% include '_textarea.html' %}
+        {% set question_data = question.radio %}
         {% include '_radio.html' %}
-
     </div>
         <button type="submit" class="govuk-button">
   Continue

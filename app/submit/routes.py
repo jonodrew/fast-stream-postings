@@ -30,7 +30,10 @@ def role_details():
                                      'Developed Vetting': 'DV',
                                      'Not applicable': 'NA'},
                           'for': 'clearance'
-                          }
+                          },
+                'responsibilities': {'for': 'responsibilities',
+                                     'label': 'Main responsibilities and deliverables of post',
+                                     'hint': "We'll use this to decide if the role has sufficient stretch"}
                 }
     if request.method == 'POST':
         print(request.form)
