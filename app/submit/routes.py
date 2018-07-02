@@ -14,8 +14,9 @@ def start():
 def role_details():
     question = {'textarea': {'label': 'Role description',
                              'hint': "Please give a description of the role and some context. For example, what "
-                                     "are the team's priorities?"},
-                'text_input': {'for': 'role_title',
+                                     "are the team's priorities?",
+                             'for': 'role-description'},
+                'text_input': {'for': 'role-title',
                                'label': 'Role title',
                                'hint': "This should be one of the 37 "
                                        "<a href='https://www.gov.uk/government/collections/digital-data-and-technology-profession-capability-framework'> "
@@ -27,8 +28,12 @@ def role_details():
                                      'Security Check': 'SC',
                                      'Counter-Terrorism Check': 'CTC',
                                      'Developed Vetting': 'DV',
-                                     'Not applicable': 'NA'}
-                          }
+                                     'Not applicable': 'NA'},
+                          'for': 'clearance'
+                          },
+                'responsibilities': {'for': 'responsibilities',
+                                     'label': 'Main responsibilities and deliverables of post',
+                                     'hint': "We'll use this to decide if the role has sufficient stretch"}
                 }
     if request.method == 'POST':
         print(request.form)

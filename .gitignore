@@ -103,11 +103,9 @@ venv.bak/
 # mypy
 .mypy_cache/
 .idea*
-Dockerfile-local
 bin*
 pip-selfcheck.json
 pyvenv.cfg
-docker-compose.yml
 
 share*
 lib64
