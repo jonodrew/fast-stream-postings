@@ -1,10 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+<div class="govuk-checkboxes__item">
+    <input class="govuk-checkboxes__input" id={{ question_data.name ~ i }} name={{ question_data.name }} type="checkbox"
+           value={{ value }}>
+    <label class="govuk-label govuk-checkboxes__label" for={{ question_data.name ~ i }}>
+        {{ label }}
+    </label>
+</div>

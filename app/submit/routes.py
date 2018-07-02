@@ -11,8 +11,42 @@ def start():
     return render_template('submit/start.html', title='Submit a Fast Stream role')
 
 
+@bp.route('/role-details', methods=['GET', 'POST'])
+def role_details():
+    question = {
+        'textarea': {
+            'label': 'Role description',
+                             'hint': "Please give a description of the role and some context. For example, what "
+                                     "are the team's priorities?",
+                             'for': 'role-description'
+        },
+        'role_title': {
+            'for': 'role-title',
+            'label': 'Role title',
+            'hint': "For preference, this should be one of the 37 "
+                    "<a href='https://www.gov.uk/government/collections/digital-data-and-technology-profession-capability-framework'> "
+                    "DDaT roles"
+                       },
+                'radio': {'heading': 'What level of security clearance is required?',
+                          'name': 'security-clearance-required',
+                          'values': {'Baseline Personnel Security Standard': 'BPSS',
+                                     'Security Check': 'SC',
+                                     'Counter-Terrorism Check': 'CTC',
+                                     'Developed Vetting': 'DV',
+                                     'Not applicable': 'NA'},
+                          'for': 'clearance'
+                          },
+                'responsibilities': {'for': 'responsibilities',
+                                     'label': 'Main responsibilities and deliverables of post',
+                                     'hint': "We'll use this to decide if the role has sufficient stretch"}
+                }
+    return render_template('submit/role-details.html', title='Role details', question=question)
+
+
 @bp.route('/role-family', methods=['POST', 'GET'])
 def role_family():
+    if request.method == 'POST':
+        redis.set('role details', request.form)
     question = {
         'family': {
             'heading': 'In which job family does this role sit?',
@@ -29,8 +63,16 @@ def role_family():
     return render_template('submit/role-family.html', question=question)
 
 
-@bp.route('/role-details', methods=['GET', 'POST'])
-def role_details():
+@bp.route('/role-specifics', methods=['POST', 'GET'])
+def role_specifics():
+    question = {
+        'data': ['Data engineer']
+    }
+    return render_template('submit/role-specifics.html', question=question)
+
+
+@bp.route('/skills', methods=['POST', 'GET'])
+def skills():
     roles = {
         'data': {
             'Data engineer': 'data_engineer',
@@ -44,43 +86,23 @@ def role_details():
         'values': {},
         'for': 'role_title'
     }
-    if request.method == 'POST':
-        json_data = request.form
-        job_roles['values'] = roles[json_data['ddat-job-family']]
-    question = {'textarea': {'label': 'Role description',
-                             'hint': "Please give a description of the role and some context. For example, what "
-                                     "are the team's priorities?",
-                             'for': 'role-description'},
-                'text_input': {'for': 'role-title',
-                               'label': 'Role title',
-                               'hint': "This should be one of the 37 "
-                                       "<a href='https://www.gov.uk/government/collections/digital-data-and-technology-profession-capability-framework'> "
-                                       "DDaT roles"
-                               },
-                'radio': {'heading': 'What level of security clearance is required?',
-                          'name': 'security-clearance-required',
-                          'values': {'Baseline Personnel Security Standard': 'BPSS',
-                                     'Security Check': 'SC',
-                                     'Counter-Terrorism Check': 'CTC',
-                                     'Developed Vetting': 'DV',
-                                     'Not applicable': 'NA'},
-                          'for': 'clearance'
-                          },
-                'responsibilities': {'for': 'responsibilities',
-                                     'label': 'Main responsibilities and deliverables of post',
-                                     'hint': "We'll use this to decide if the role has sufficient stretch"}
-                }
-    return render_template('submit/role-details.html', title='Role details', question=question, job_roles=job_roles)
-
-
-@bp.route('/role-specifics', methods=['POST', 'GET'])
-def role_specifics():
-    if request.method == 'POST':
-        redis.set('role details', request.form)
+    json_data = request.form
+    job_roles['values'] = roles[json_data['ddat-job-family']]
     question = {
-        'data': ['Data engineer']
+        'roles': job_roles,
+        'skill_1': {
+            'for': 'skill-description-1',
+            'hint': '',
+            'label': 'Please say how this post delivers the first skill group'
+        },
+        'skill_2': {
+            'for': 'skill-description-2',
+            'hint': '',
+            'label': 'Please say how this post delivers the second skill group'
+        }
     }
-    return render_template('submit/role-specifics.html', question=question)
+
+    return render_template('submit/skills.html', question=question)
 
 
 @bp.route('/logistical-details', methods=['POST', 'GET'])
