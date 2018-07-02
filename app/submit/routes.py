@@ -7,6 +7,7 @@ from app import redis
 
 @bp.route('/start', methods=['GET', 'POST'])
 def start():
+    redis.set('role data', {})
     return render_template('submit/start.html', title='Submit a Fast Stream role')
 
 
@@ -35,11 +36,46 @@ def role_details():
                                      'label': 'Main responsibilities and deliverables of post',
                                      'hint': "We'll use this to decide if the role has sufficient stretch"}
                 }
-    if request.method == 'POST':
-        print(request.form)
-        print(request.form['email'])
-        redis.set('role details', request.form)
     return render_template('submit/role-details.html', title='Role details', question=question)
+
+
+@bp.route('/logistical-details', methods=['POST', 'GET'])
+def logistical_details():
+    if request.method == 'POST':
+        redis.set('role details', request.form)
+    question = {'department': {'for': 'department',
+                               'label': 'What department or agency is this role in?',
+                               'hint': "What's your organisation generally known as?"},
+                'directorate': {'for': 'directorate',
+                                'label': 'Which business area or directorate is this role in?',
+                                'hint': 'This should describe the immediate context in which the Fast Streamer will be'
+                                        ' working.'},
+                'location': {'for': 'location',
+                             'label': 'Please give an address for this role',
+                             'hint': 'Please include a postcode. This might not be where the Fast Streamer will spend'
+                                     'all their time, but it will help us decide whether they\'ll need to relocate'},
+                'length': {'heading': 'How long is this post?',
+                           'name': 'post-length',
+                           'values': {'6 months': 6,
+                                      '12 months': 12},
+                           'for': 'post-length'},
+                'ongoing': {'heading': 'Is this post a one-off, or ongoing?',
+                            'name': 'ongoing',
+                            'values': {'One-off': 'one-off',
+                                       'Ongoing': 'ongoing'},
+                            },
+                'start': {'for': 'start-month',
+                          'label': 'What month would you prefer the Fast Streamer start?',
+                          'hint': 'The start date will generally be 1st of the month, unless the Fast Streamer has'
+                                  ' already booked some leave.'}
+
+                }
+    return render_template('submit/logistical-details.html', question=question)
+
+
+@bp.route('/contact-details', methods=['GET', 'POST'])
+def contact_details():
+    pass
 
 
 @bp.route('/confirm-role-details', methods=['GET', 'POST'])
