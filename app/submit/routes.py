@@ -7,6 +7,7 @@ from app import redis
 
 @bp.route('/start', methods=['GET', 'POST'])
 def start():
+    redis.set('role data', {})
     return render_template('submit/start.html', title='Submit a Fast Stream role')
 
 
@@ -47,7 +48,8 @@ def logistical_details():
                                'hint': "What's your organisation generally known as?"},
                 'directorate': {'for': 'directorate',
                                 'label': 'Which business area or directorate is this role in?',
-                                'hint': 'This should describe the immediate context in which the Fast Streamer is working.'},
+                                'hint': 'This should describe the immediate context in which the Fast Streamer will be'
+                                        ' working.'},
                 'location': {'for': 'location',
                              'label': 'Please give an address for this role',
                              'hint': 'Please include a postcode. This might not be where the Fast Streamer will spend'
@@ -62,9 +64,18 @@ def logistical_details():
                             'values': {'One-off': 'one-off',
                                        'Ongoing': 'ongoing'},
                             },
+                'start': {'for': 'start-month',
+                          'label': 'What month would you prefer the Fast Streamer start?',
+                          'hint': 'The start date will generally be 1st of the month, unless the Fast Streamer has'
+                                  ' already booked some leave.'}
 
                 }
     return render_template('submit/logistical-details.html', question=question)
+
+
+@bp.route('/contact-details', methods=['GET', 'POST'])
+def contact_details():
+    pass
 
 
 @bp.route('/confirm-role-details', methods=['GET', 'POST'])
