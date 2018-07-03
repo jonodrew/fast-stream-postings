@@ -1,14 +1,13 @@
-from typing import List
+from typing import Dict, List
 
 
-class Role:
-    def __init__(self, name: str, skills: List[str], level: str):
+class RoleQuestion:
+    def __init__(self, name: str, skills: Dict[str, int]):
         self.name = name
         self.skills = skills
-        self.level = level
 
 
 class Family:
-    def __init__(self, name: str, roles: List[Role]):
+    def __init__(self, name: str, roles: List[RoleQuestion]):
         self.name = name
         self.roles = roles

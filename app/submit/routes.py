@@ -1,5 +1,5 @@
 from flask import render_template, redirect, url_for, session, request
-
+from app.submit.classes import RoleQuestion
 from app import db
 from app.submit import bp
 from app import redis
@@ -7,12 +7,14 @@ from app import redis
 
 @bp.route('/start', methods=['GET', 'POST'])
 def start():
-    redis.set('role data', {})
     return render_template('submit/start.html', title='Submit a Fast Stream role')
 
 
 @bp.route('/role-details', methods=['GET', 'POST'])
 def role_details():
+    if request.method == 'POST':
+        redis.set('role details', request.form)
+        return redirect(url_for('submit.role_family'))
     question = {
         'textarea': {
             'label': 'Role description',
@@ -46,7 +48,16 @@ def role_details():
 @bp.route('/role-family', methods=['POST', 'GET'])
 def role_family():
     if request.method == 'POST':
-        redis.set('role details', request.form)
+        roles = {
+                'data': {
+                    'data-engineer': 'Data engineer',
+                    'Data scientist': 'data_scientist',
+                    'Performance analyst': 'performance_analyst'
+                }
+            }
+        redis.set('family', request.form['ddat-job-family'])
+        family = request.form['ddat-job-family']
+        return redirect(url_for('submit.skills', family=family))
     question = {
         'family': {
             'heading': 'In which job family does this role sit?',
@@ -63,6 +74,7 @@ def role_family():
     return render_template('submit/role-family.html', question=question)
 
 
+
 @bp.route('/role-specifics', methods=['POST', 'GET'])
 def role_specifics():
     question = {
@@ -71,38 +83,52 @@ def role_specifics():
     return render_template('submit/role-specifics.html', question=question)
 
 
-@bp.route('/skills', methods=['POST', 'GET'])
-def skills():
-    roles = {
-        'data': {
-            'Data engineer': 'data_engineer',
-            'Data scientist': 'data_scientist',
-            'Performance analyst': 'performance_analyst'
+@bp.route('/skills/<family>', methods=['POST', 'GET'])
+def skills(family):
+    r = RoleQuestion('Data Engineer', {
+                            'Data analysis and synthesis': 1031,
+                            'Communicating between the technical and the non-technical': 1023,
+                            'Data development process': 1033,
+                            'Data integration design': 1037,
+                            'Data modelling': 1038,
+                            'Programming and build (data engineering)': 1084,
+                            'Technical understanding (data engineering)': 1116,
+                            'Testing': 1118
+                        })
+    r2 = RoleQuestion('Data Engineer Mk 2', {
+                            'Data analysis and synthesis': 1031,
+                            'Communicating between the technical and the non-technical': 1023,
+                            'Data development process': 1033,
+                            'Data integration design': 1037,
+                            'Data modelling': 1038,
+                            'Programming and build (data engineering)': 1084,
+                            'Technical understanding (data engineering)': 1116,
+                            'Testing': 1118
+                        })
+    families = {
+        'data': [r, r2]
         }
-    }
-    job_roles = {
-        'heading': 'Please select the role title',
-        'name': 'role-title',
-        'values': {},
-        'for': 'role_title'
-    }
-    json_data = request.form
-    job_roles['values'] = roles[json_data['ddat-job-family']]
-    question = {
-        'roles': job_roles,
-        'skill_1': {
-            'for': 'skill-description-1',
-            'hint': '',
-            'label': 'Please say how this post delivers the first skill group'
-        },
-        'skill_2': {
-            'for': 'skill-description-2',
-            'hint': '',
-            'label': 'Please say how this post delivers the second skill group'
+    roles_in_family = families[redis.get('family')]
+    if request.method == 'POST':  # user has clicked 'complete'
+        redis.incr('roles_seen')  # increment the number of roles seen
+        seen_roles = redis.get('roles_seen')
+        current_role = roles_in_family[seen_roles]
+        r = {
+            'title': current_role.name,
+            'skills': {
+                'heading': 'Which of the following skills will this role develop?',
+                'name': '{}-skills'.format(current_role.name),
+                'values': current_role.skills,
+                'for': '{}-skills'.format(current_role.name)
+            }
         }
-    }
+        if seen_roles == len(families[family]) - 1:
+            pass  # it's the last role
+        else:
+            return render_template('skills', role=r)
+    return render_template(url_for('skills', ))
+    return render_template('submit/skills.html', title=name)
 
-    return render_template('submit/skills.html', question=question)
 
 
 @bp.route('/logistical-details', methods=['POST', 'GET'])

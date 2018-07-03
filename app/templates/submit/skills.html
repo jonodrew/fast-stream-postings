@@ -5,16 +5,11 @@
     <div class="govuk-main-wrapper">
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
-        <h1 class="govuk-heading-xl">Role skills</h1>
+        <h1 class="govuk-heading-xl">{{ role.title }}</h1>
         <form action="{{ url_for('submit.skills') }}" method="post">
-            <div class="govuk-form-group">
-                {% set question_data = question.roles %}
-                {% include '_checkboxes.html' %}
-            </div>
-            {% set question_data = question.skill_1 %}
-            {% include '_textarea.html' %}
-            {% set question_data = question.skill_2 %}
-            {% include '_textarea.html' %}
+            {% set question_data = roles.skills %}
+            {% include '_checkboxes.html' %}
+            {% set question_data = roles.description %}
             <button type="submit" class="govuk-button">
               Continue
             </button>

@@ -6,7 +6,7 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-xl">Role family</h1>
-        <form action="{{ url_for('submit.skills') }}" method="post">
+        <form method="post">
             <div class="govuk-form-group">
                 {% set question_data = question.family %}
                 {% include '_radio.html' %}
