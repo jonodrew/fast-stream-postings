@@ -96,26 +96,26 @@ def skills():
                             'Programming and build (data engineering)': 1084,
                             'Technical understanding (data engineering)': 1116,
                             'Testing': 1118
-                        }),
+                        })
     r3 = RoleQuestion('Strategy and Policy', {
-        'Drafting': 1,
-        'Briefing': 2,
-        'Research': 3,
-        'Working with ministers': 4,
-        'Bills and legislation': 5,
-        'Policy evaluation': 6,
-        'Parliamentary questions/Freedom of Information requests': 7
-    }),
+                            'Drafting': 1,
+                            'Briefing': 2,
+                            'Research': 3,
+                            'Working with ministers': 4,
+                            'Bills and legislation': 5,
+                            'Policy evaluation': 6,
+                            'Parliamentary questions/Freedom of Information requests': 7
+                         })
     r4 = RoleQuestion('Generalist skill areas', {
-        'Commercial awareness': 11,
-        'Financial management': 12,
-        'People management': 13,
-        'Programme management': 14,
-        'Change management': 15,
-        'Science/engineering policy facing': 16,
-        'International policy facing': 17
+                            'Commercial awareness': 11,
+                            'Financial management': 12,
+                            'People management': 13,
+                            'Programme management': 14,
+                            'Change management': 15,
+                            'Science/engineering policy facing': 16,
+                            'International policy facing': 17
 
-    })
+                        })
     families = {
         'data': [r, r2, r3, r4]
         }
