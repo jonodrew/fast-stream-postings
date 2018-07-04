@@ -1,0 +1,10 @@
+<table class="govuk-table">
+    <caption class="govuk-table__caption">
+        {{ data.caption }}
+    </caption>
+    <tbody class="govuk-table__body">
+        {% for question, detail in data.row_data.items() %}
+            {% include '_table-content-row.html' %}
+        {% endfor %}
+    </tbody>
+</table>
