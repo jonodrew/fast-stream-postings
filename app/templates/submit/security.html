@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="govuk-main-wrapper">
+        <div class="govuk-grid-row">
+          <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl">Security details</h1>
+            <form action="{{ url_for('submit.contact_details') }}", method="post">
+                <div class="govuk-form-group">
+                    {% set question_data = question.clearance %}
+                    {% include '_radio.html' %}
+                </div>
+                <div class="govuk-form-group">
+                  <fieldset class="govuk-fieldset">
+                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+                      <h1 class="govuk-fieldset__heading">
+                        {{ question.nationality.label }}
+                      </h1>
+                    </legend>
+                    <div class="govuk-radios" data-module="radios">
+                      <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="nationality-restrictions-true"
+                               name="nationality-restrictions" type="radio" value="yes"
+                               data-aria-controls="conditional-nationality-restrictions-true-detail">
+                        <label class="govuk-label govuk-radios__label" for="nationality-restrictions-true">
+                        Yes
+                      </label>
+                      </div>
+                      <div class="govuk-radios__conditional" id="conditional-nationality-restrictions-true-detail">
+                        <div class="govuk-form-group">
+                          <label class="govuk-label" for="conditional-nationality-restrictions-true-detail">
+                              Which nationalities are acceptable for this role?
+                          </label>
+                          <input class="govuk-input govuk-!-width-one-third" id="nationality-detail"
+                                 name="nationality-detail" type="text">
+                        </div>
+                      </div>
+                        <div class="govuk-radios__item">
+                            <input class="govuk-radios__input" id="nationality-restrictions-false" name="nationality-restrictions"
+                                   type="radio" value="no">
+                            <label class="govuk-label govuk-radios__label" for="nationality-restrictions-false">
+                                No
+                            </label>
+                        </div>
+                    </div>
+                  </fieldset>
+                </div>
+
+                <button type="submit" class="govuk-button">
+                  Continue
+                </button>
+            </form>
+          </div>
+        </div>
+    </div>
+
+
+{% endblock %}
