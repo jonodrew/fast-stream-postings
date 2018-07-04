@@ -137,6 +137,25 @@ def skills():
             'name': '{}-skills'.format(current_role.name),
             'values': current_role.skills,
             'for': '{}-skills'.format(current_role.name)
+        },
+        'description': {
+                'label': 'How will the role deliver these skills?',
+                'hint': "Please give a brief description of how this role will develop the Fast Streamers skills in the"
+                        " areas you've indicated. If you've not ticked anything, there's no need to complete this box.",
+                'for': '{}-skills-describe'.format(current_role.name)
+        },
+        'skill_level': {
+            'heading': 'What level of skill will the candidate gain?',
+            'name': '{}-skill-level'.format(current_role.name),
+            'values': {
+                'Awareness': 1,
+                'Working': 2,
+                'Practitioner': 3,
+                'Expert': 4
+            },
+            'for': '{}-skill-level'.format(current_role.name),
+            'hint': "Across all the skills you've indicated, what level of ability do you expect the Fast Streamer to "
+                    "have at the end of this post?"
         }
     }
     return render_template('submit/skills.html', role=r, next_step=next_step)

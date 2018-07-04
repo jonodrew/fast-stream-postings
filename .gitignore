@@ -109,3 +109,7 @@ pyvenv.cfg
 
 share*
 lib64
+.sass-cache/
+Dockerfile-local
+package-lock.json
+package.json
