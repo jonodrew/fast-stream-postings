@@ -2,12 +2,13 @@ from flask import Flask, url_for
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from flask_migrate import Migrate
-from redis import Redis
+from redis import StrictRedis
 from flask_redis import FlaskRedis
 
 db = SQLAlchemy()
 migrate = Migrate()
-redis = Redis(host='redis', port=6379)
+redis = StrictRedis(host='redis', port=6379, charset="utf-8", decode_responses=True)
+
 
 def create_app(config_class=Config) -> Flask:
     app = Flask(__name__)

@@ -1,0 +1,18 @@
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset" aria-describedby="{{ question_data.name }}-hint">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
+      <h1 class="govuk-fieldset__heading">
+        {{ question_data.heading }}
+      </h1>
+    </legend>
+      {% if 'hint' in question_data %}
+    <span id="{{ question_data.name }}-hint" class="govuk-hint">
+        {{ question_data.hint }}
+    </span>
+      {% endif %}
+  {% for label, value in question_data['values'].items()  %}
+    {% set i = loop.index %}
+    {% include '_checkbox_input.html' %}
+      {% endfor %}
+  </fieldset>
+</div>

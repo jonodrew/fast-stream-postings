@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">{{ family }} roles</h1>
+          <p>We're now going to take you through the different skills required for each different role in this job
+          family. We'd expect the skills to mostly be clustered around one or two job roles, so there may be pages
+          where you don't select any skills.</p>
+          <form method="post">
+              <button type="submit" class="govuk-button">
+                  Continue
+              </button>
+          </form>
+      </div>
+    </div>
+  </div>
+
+
+{% endblock %}

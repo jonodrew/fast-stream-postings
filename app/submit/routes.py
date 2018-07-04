@@ -1,5 +1,5 @@
 from flask import render_template, redirect, url_for, session, request
-
+from app.submit.classes import RoleQuestion
 from app import db
 from app.submit import bp
 from app import redis
@@ -7,22 +7,28 @@ from app import redis
 
 @bp.route('/start', methods=['GET', 'POST'])
 def start():
-    redis.set('role data', {})
     return render_template('submit/start.html', title='Submit a Fast Stream role')
 
 
 @bp.route('/role-details', methods=['GET', 'POST'])
 def role_details():
-    question = {'textarea': {'label': 'Role description',
+    if request.method == 'POST':
+        redis.set('role details', request.form)
+        return redirect(url_for('submit.role_family'))
+    question = {
+        'textarea': {
+            'label': 'Role description',
                              'hint': "Please give a description of the role and some context. For example, what "
                                      "are the team's priorities?",
-                             'for': 'role-description'},
-                'text_input': {'for': 'role-title',
-                               'label': 'Role title',
-                               'hint': "This should be one of the 37 "
-                                       "<a href='https://www.gov.uk/government/collections/digital-data-and-technology-profession-capability-framework'> "
-                                       "DDaT roles"
-                               },
+                             'for': 'role-description'
+        },
+        'role_title': {
+            'for': 'role-title',
+            'label': 'Role title',
+            'hint': "For preference, this should be one of the 37 "
+                    "<a href='https://www.gov.uk/government/collections/digital-data-and-technology-profession-capability-framework'> "
+                    "DDaT roles"
+                       },
                 'radio': {'heading': 'What level of security clearance is required?',
                           'name': 'security-clearance-required',
                           'values': {'Baseline Personnel Security Standard': 'BPSS',
@@ -39,10 +45,127 @@ def role_details():
     return render_template('submit/role-details.html', title='Role details', question=question)
 
 
+@bp.route('/role-family', methods=['POST', 'GET'])
+def role_family():
+    if request.method == 'POST':
+        roles = {
+                'data': {
+                    'data-engineer': 'Data engineer',
+                    'Data scientist': 'data_scientist',
+                    'Performance analyst': 'performance_analyst'
+                }
+            }
+        redis.set('family', request.form['ddat-job-family'])
+        family = request.form['ddat-job-family']
+        return redirect(url_for('submit.skills'))
+    question = {
+        'family': {
+            'heading': 'In which job family does this role sit?',
+            'name': 'ddat-job-family',
+            'values': {'Data': 'data',
+                      'IT Operations': 'ITOps',
+                      'Product and delivery': 'PD',
+                      'Quality Assurance Testing': 'QAT',
+                      'Technical': 'technical',
+                      'User-centred design': 'UCD'},
+            'for': 'ddat_job_family'
+        }
+    }
+    redis.set('roles_seen', 0)
+    return render_template('submit/role-family.html', question=question)
+
+
+@bp.route('/skills', methods=['POST', 'GET'])
+def skills():
+    r = RoleQuestion('Data Engineer', {
+                            'Data analysis and synthesis': 1031,
+                            'Communicating between the technical and the non-technical': 1023,
+                            'Data development process': 1033,
+                            'Data integration design': 1037,
+                            'Data modelling': 1038,
+                            'Programming and build (data engineering)': 1084,
+                            'Technical understanding (data engineering)': 1116,
+                            'Testing': 1118
+                        })
+    r2 = RoleQuestion('Data Engineer Mk 2', {
+                            'Data analysis and synthesis': 1031,
+                            'Communicating between the technical and the non-technical': 1023,
+                            'Data development process': 1033,
+                            'Data integration design': 1037,
+                            'Data modelling': 1038,
+                            'Programming and build (data engineering)': 1084,
+                            'Technical understanding (data engineering)': 1116,
+                            'Testing': 1118
+                        })
+    r3 = RoleQuestion('Strategy and Policy', {
+                            'Drafting': 1,
+                            'Briefing': 2,
+                            'Research': 3,
+                            'Working with ministers': 4,
+                            'Bills and legislation': 5,
+                            'Policy evaluation': 6,
+                            'Parliamentary questions/Freedom of Information requests': 7
+                         })
+    r4 = RoleQuestion('Generalist skill areas', {
+                            'Commercial awareness': 11,
+                            'Financial management': 12,
+                            'People management': 13,
+                            'Programme management': 14,
+                            'Change management': 15,
+                            'Science/engineering policy facing': 16,
+                            'International policy facing': 17
+
+                        })
+    families = {
+        'data': [r, r2, r3, r4]
+        }
+    roles_in_family = families[redis.get('family')]
+    next_step = 'submit.skills'
+    if request.method == 'POST':  # user has clicked 'complete'
+        redis.incr('roles_seen', 1)  # increment the number of roles seen
+        seen_roles = int(redis.get('roles_seen'))
+        if request.form:
+            redis.hmset('skills-{}'.format(seen_roles-1), request.form)
+        if seen_roles == len(roles_in_family) - 1:
+            next_step = 'submit.logistical_details'
+    seen_roles = int(redis.get('roles_seen'))
+    current_role = roles_in_family[seen_roles]
+    r = {
+        'title': current_role.name,
+        'skills': {
+            'heading': 'Which of the following skills will this role develop?',
+            'name': '{}-skills'.format(current_role.name),
+            'values': current_role.skills,
+            'for': '{}-skills'.format(current_role.name)
+        },
+        'description': {
+                'label': 'How will the role deliver these skills?',
+                'hint': "Please give a brief description of how this role will develop the Fast Streamers skills in the"
+                        " areas you've indicated. If you've not ticked anything, there's no need to complete this box.",
+                'for': '{}-skills-describe'.format(current_role.name)
+        },
+        'skill_level': {
+            'heading': 'What level of skill will the candidate gain?',
+            'name': '{}-skill-level'.format(current_role.name),
+            'values': {
+                'Awareness': 1,
+                'Working': 2,
+                'Practitioner': 3,
+                'Expert': 4
+            },
+            'for': '{}-skill-level'.format(current_role.name),
+            'hint': "Across all the skills you've indicated, what level of ability do you expect the Fast Streamer to "
+                    "have at the end of this post?"
+        }
+    }
+    return render_template('submit/skills.html', role=r, next_step=next_step)
+
+
 @bp.route('/logistical-details', methods=['POST', 'GET'])
 def logistical_details():
     if request.method == 'POST':
-        redis.set('role details', request.form)
+        redis.set('logistical details', request.form)
+        redirect(url_for('submit.security'))
     question = {'department': {'for': 'department',
                                'label': 'What department or agency is this role in?',
                                'hint': "What's your organisation generally known as?"},
@@ -54,11 +177,19 @@ def logistical_details():
                              'label': 'Please give an address for this role',
                              'hint': 'Please include a postcode. This might not be where the Fast Streamer will spend'
                                      'all their time, but it will help us decide whether they\'ll need to relocate'},
-                'length': {'heading': 'How long is this post?',
-                           'name': 'post-length',
-                           'values': {'6 months': 6,
-                                      '12 months': 12},
-                           'for': 'post-length'},
+                'experience': {
+                    'heading': 'How much experience do you expect the Fast Streamer to aleady have to be efficient in '
+                               'this role?',
+                               'name': 'post-length',
+                               'values': {'0 - 6 months': 1,
+                                          '12 - 18 months': 2,
+                                          '2 years': 3,
+                                          '3 years': 4
+                                          },
+                               'for': 'post-experience',
+                    'hint': 'Remember that this is the amount of general DDaT experience, rather than experience in '
+                            'this area'
+                },
                 'ongoing': {'heading': 'Is this post a one-off, or ongoing?',
                             'name': 'ongoing',
                             'values': {'One-off': 'one-off',
@@ -71,7 +202,6 @@ def logistical_details():
 
                 }
     return render_template('submit/logistical-details.html', question=question)
-
 
 @bp.route('/contact-details', methods=['GET', 'POST'])
 def contact_details():
