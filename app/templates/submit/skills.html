@@ -6,10 +6,10 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-xl">{{ role.title }}</h1>
-        <form action="{{ url_for('submit.skills') }}" method="post">
-            {% set question_data = roles.skills %}
+        <form action="{{ url_for(next_step) }}" method="post">
+            {% set question_data = role.skills %}
             {% include '_checkboxes.html' %}
-            {% set question_data = roles.description %}
+            {% set question_data = role.description %}
             <button type="submit" class="govuk-button">
               Continue
             </button>

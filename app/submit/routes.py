@@ -57,7 +57,7 @@ def role_family():
             }
         redis.set('family', request.form['ddat-job-family'])
         family = request.form['ddat-job-family']
-        return redirect(url_for('submit.skills', family=family))
+        return redirect(url_for('submit.skills'))
     question = {
         'family': {
             'heading': 'In which job family does this role sit?',
@@ -71,20 +71,12 @@ def role_family():
             'for': 'ddat_job_family'
         }
     }
+    redis.set('roles_seen', 0)
     return render_template('submit/role-family.html', question=question)
 
 
-
-@bp.route('/role-specifics', methods=['POST', 'GET'])
-def role_specifics():
-    question = {
-        'data': ['Data engineer']
-    }
-    return render_template('submit/role-specifics.html', question=question)
-
-
-@bp.route('/skills/<family>', methods=['POST', 'GET'])
-def skills(family):
+@bp.route('/skills', methods=['POST', 'GET'])
+def skills():
     r = RoleQuestion('Data Engineer', {
                             'Data analysis and synthesis': 1031,
                             'Communicating between the technical and the non-technical': 1023,
@@ -104,31 +96,50 @@ def skills(family):
                             'Programming and build (data engineering)': 1084,
                             'Technical understanding (data engineering)': 1116,
                             'Testing': 1118
-                        })
+                        }),
+    r3 = RoleQuestion('Strategy and Policy', {
+        'Drafting': 1,
+        'Briefing': 2,
+        'Research': 3,
+        'Working with ministers': 4,
+        'Bills and legislation': 5,
+        'Policy evaluation': 6,
+        'Parliamentary questions/Freedom of Information requests': 7
+    }),
+    r4 = RoleQuestion('Generalist skill areas', {
+        'Commercial awareness': 11,
+        'Financial management': 12,
+        'People management': 13,
+        'Programme management': 14,
+        'Change management': 15,
+        'Science/engineering policy facing': 16,
+        'International policy facing': 17
+
+    })
     families = {
-        'data': [r, r2]
+        'data': [r, r2, r3, r4]
         }
     roles_in_family = families[redis.get('family')]
+    next_step = 'submit.skills'
     if request.method == 'POST':  # user has clicked 'complete'
-        redis.incr('roles_seen')  # increment the number of roles seen
-        seen_roles = redis.get('roles_seen')
-        current_role = roles_in_family[seen_roles]
-        r = {
-            'title': current_role.name,
-            'skills': {
-                'heading': 'Which of the following skills will this role develop?',
-                'name': '{}-skills'.format(current_role.name),
-                'values': current_role.skills,
-                'for': '{}-skills'.format(current_role.name)
-            }
+        redis.incr('roles_seen', 1)  # increment the number of roles seen
+        seen_roles = int(redis.get('roles_seen'))
+        if request.form:
+            redis.hmset('skills-{}'.format(seen_roles-1), request.form)
+        if seen_roles == len(roles_in_family) - 1:
+            next_step = 'submit.logistical_details'
+    seen_roles = int(redis.get('roles_seen'))
+    current_role = roles_in_family[seen_roles]
+    r = {
+        'title': current_role.name,
+        'skills': {
+            'heading': 'Which of the following skills will this role develop?',
+            'name': '{}-skills'.format(current_role.name),
+            'values': current_role.skills,
+            'for': '{}-skills'.format(current_role.name)
         }
-        if seen_roles == len(families[family]) - 1:
-            pass  # it's the last role
-        else:
-            return render_template('skills', role=r)
-    return render_template(url_for('skills', ))
-    return render_template('submit/skills.html', title=name)
-
+    }
+    return render_template('submit/skills.html', role=r, next_step=next_step)
 
 
 @bp.route('/logistical-details', methods=['POST', 'GET'])
