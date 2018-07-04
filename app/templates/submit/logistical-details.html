@@ -12,12 +12,12 @@
             {% include '_text_input.html' %}
             {% set question_data = question.directorate %}
             {% include '_text_input.html' %}
-            {% set question_data = question.length %}
-            {% include '_radio.html' %}
-            {% set question_data = question.ongoing %}
-            {% include '_radio.html' %}
             {% set question_data = question.start %}
             {% include '_text_input.html' %}
+            {% set question_data = question.experience %}
+            {% include '_checkboxes.html' %}
+            {% set question_data = question.ongoing %}
+            {% include '_radio.html' %}
     <div class="govuk-form-group">
 
     </div>

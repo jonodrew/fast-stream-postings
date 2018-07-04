@@ -164,7 +164,8 @@ def skills():
 @bp.route('/logistical-details', methods=['POST', 'GET'])
 def logistical_details():
     if request.method == 'POST':
-        redis.set('role specifics', request.form)
+        redis.set('logistical details', request.form)
+        redirect(url_for('submit.security'))
     question = {'department': {'for': 'department',
                                'label': 'What department or agency is this role in?',
                                'hint': "What's your organisation generally known as?"},
@@ -176,11 +177,19 @@ def logistical_details():
                              'label': 'Please give an address for this role',
                              'hint': 'Please include a postcode. This might not be where the Fast Streamer will spend'
                                      'all their time, but it will help us decide whether they\'ll need to relocate'},
-                'length': {'heading': 'How long is this post?',
-                           'name': 'post-length',
-                           'values': {'6 months': 6,
-                                      '12 months': 12},
-                           'for': 'post-length'},
+                'experience': {
+                    'heading': 'How much experience do you expect the Fast Streamer to aleady have to be efficient in '
+                               'this role?',
+                               'name': 'post-length',
+                               'values': {'0 - 6 months': 1,
+                                          '12 - 18 months': 2,
+                                          '2 years': 3,
+                                          '3 years': 4
+                                          },
+                               'for': 'post-experience',
+                    'hint': 'Remember that this is the amount of general DDaT experience, rather than experience in '
+                            'this area'
+                },
                 'ongoing': {'heading': 'Is this post a one-off, or ongoing?',
                             'name': 'ongoing',
                             'values': {'One-off': 'one-off',
@@ -193,7 +202,6 @@ def logistical_details():
 
                 }
     return render_template('submit/logistical-details.html', question=question)
-
 
 @bp.route('/contact-details', methods=['GET', 'POST'])
 def contact_details():
