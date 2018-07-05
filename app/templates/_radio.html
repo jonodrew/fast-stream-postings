@@ -3,6 +3,11 @@
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
         {{ question_data.heading }}
     </legend>
+    {% if 'hint' in question_data %}
+    <span id="{{ question_data.name }}-hint" class="govuk-hint">
+        {{ question_data.hint }}
+    </span>
+      {% endif %}
     <div class="govuk-radios">
         {% for label, value in question_data['values'].items()  %}
             {% set i = loop.index %}
