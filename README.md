@@ -6,7 +6,7 @@ container for persisting data, and a Python container to run the Flask web serve
 
 To run this locally for yourself, you'll need to install [Docker Compose](https://docs.docker.com/compose/install/).
 
-Once you've install that (and Docker, if you didn't already have it), clone this repo with `git clone`. Then `cd` into 
+Once you've installed that (and Docker, if you didn't already have it), clone this repo with `git clone`. Then `cd` into 
 the folder and run the following command:
 `docker-compose up`
 
