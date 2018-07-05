@@ -10,9 +10,11 @@
         {{ question_data.hint }}
     </span>
       {% endif %}
+    <div class="govuk-checkboxes">
   {% for label, value in question_data['values'].items()  %}
     {% set i = loop.index %}
     {% include '_checkbox_input.html' %}
       {% endfor %}
+    </div>
   </fieldset>
 </div>

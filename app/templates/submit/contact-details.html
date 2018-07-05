@@ -7,8 +7,10 @@
       <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-xl">Contact details</h1>
 
-        <form method="post">
-            {% set question_data = question.name %}
+        <form method="post" action="{{ url_for('submit.confirm_role_details') }}">
+            {% set question_data = question.am_email %}
+            {% include '_text_input.html' %}
+            {% set question_data = question.grade_manager %}
             {% include '_text_input.html' %}
             {% set question_data = question.location %}
             {% include '_textarea.html' %}
