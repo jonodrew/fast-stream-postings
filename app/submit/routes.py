@@ -283,3 +283,8 @@ def confirm_role_details():
         }
         data[s] = skill_data
     return render_template('submit/confirm-role-details.html', data=data)
+
+
+@bp.route('/confirm', methods=['POST', 'GET'])
+def confirm():
+    return render_template('submit/confirm.html')
