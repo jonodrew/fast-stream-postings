@@ -112,14 +112,14 @@ def skills():
     roles_in_family = families[redis.get('family')]
     next_step = 'submit.skills'
     if request.method == 'POST':  # user has clicked 'complete'
-        prior_role = roles_in_family[int(redis.get('roles_seen'))]
+        prior_role = roles_in_family[int(redis.get('roles_seen')) - 1]
         redis.set(prior_role.name, skill_dump(request.form))
         redis.rpush('skills', prior_role.name)
-        redis.incr('roles_seen', 1)  # increment the number of roles seen
-        if redis.get('roles_seen') == len(roles_in_family) - 1:
+        if int(redis.get('roles_seen')) == len(roles_in_family) - 1:
             next_step = 'submit.logistical_details'
     seen_roles = int(redis.get('roles_seen'))
     current_role = roles_in_family[seen_roles]
+    redis.incr('roles_seen', 1)  # increment the number of roles seen
     name = current_role.name
     r = {
         'title': name,
@@ -149,7 +149,7 @@ def skills():
                     "have at the end of this post?"
         }
     }
-    return render_template('submit/skills.html', role=r, next_step=next_step)
+    return render_template('submit/skills.html', role=r, next_step=next_step, seen_roles=seen_roles)
 
 
 @bp.route('/logistical-details', methods=['POST', 'GET'])
@@ -259,6 +259,7 @@ def contact_details():
 
 @bp.route('/confirm-role-details', methods=['GET', 'POST'])
 def confirm_role_details():
+    redis.set('roles_seen', 0)
     if request.method == 'POST':
         redis.hmset('contact', request.form.to_dict())
     data = {
