@@ -111,7 +111,7 @@ def skills():
         }
     roles_in_family = families[redis.get('family')]
     seen_roles = int(redis.get('roles_seen'))
-    if request.method == 'POST':  # user has clicked 'complete'
+    if request.method == 'POST':  # user has clicked 'continue'
         prior_role = roles_in_family[seen_roles-1]
         redis.set(prior_role.name, skill_dump(request.form))
         redis.rpush('skills', prior_role.name)
@@ -150,7 +150,6 @@ def skills():
         next_step = 'submit.logistical_details'
     else:
         next_step = 'submit.skills'
-    redis.incr('roles_seen', 1)  # increment the number of roles seen
     return render_template('submit/skills.html', role=r, next_step=next_step)
 
 
