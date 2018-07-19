@@ -8,9 +8,11 @@
         <h1 class="govuk-heading-xl">Check your answers before submitting this post</h1>
         <form method="post" action="{{ url_for('submit.confirm') }}">
             <div class="govuk-form-group">
-                {% for caption, data in data.items() %}
-                    {% include '_table_section.html' %}
-                {% endfor %}
+                <table class="govuk-table">
+                    {% for caption, data in data.items() %}
+                        {% include '_table_section.html' %}
+                    {% endfor %}
+                </table>
             </div>
                 <button type="submit" class="govuk-button">
                   Continue

@@ -110,14 +110,11 @@ def skills():
         'data': [r, r2, r3, r4]
         }
     roles_in_family = families[redis.get('family')]
-    next_step = 'submit.skills'
+    seen_roles = int(redis.get('roles_seen'))
     if request.method == 'POST':  # user has clicked 'complete'
-        prior_role = roles_in_family[int(redis.get('roles_seen')) - 1]
+        prior_role = roles_in_family[seen_roles-1]
         redis.set(prior_role.name, skill_dump(request.form))
         redis.rpush('skills', prior_role.name)
-        if int(redis.get('roles_seen')) == len(roles_in_family) - 1:
-            next_step = 'submit.logistical_details'
-    seen_roles = int(redis.get('roles_seen'))
     current_role = roles_in_family[seen_roles]
     redis.incr('roles_seen', 1)  # increment the number of roles seen
     name = current_role.name
@@ -149,7 +146,12 @@ def skills():
                     "have at the end of this post?"
         }
     }
-    return render_template('submit/skills.html', role=r, next_step=next_step, seen_roles=seen_roles)
+    if seen_roles == len(roles_in_family) - 1:
+        next_step = 'submit.logistical_details'
+    else:
+        next_step = 'submit.skills'
+    redis.incr('roles_seen', 1)  # increment the number of roles seen
+    return render_template('submit/skills.html', role=r, next_step=next_step)
 
 
 @bp.route('/logistical-details', methods=['POST', 'GET'])
@@ -158,45 +160,54 @@ def logistical_details():
         prior_role = 'Generalist skills'
         redis.set(prior_role, skill_dump(request.form))
         redis.rpush(skills, prior_role)
-    question = {'department': {'for': 'department',
-                               'label': 'What department or agency is this role in?',
-                               'hint': "What's your organisation generally known as?"},
-                'directorate': {'for': 'directorate',
-                                'label': 'Which business area or directorate is this role in?',
-                                'hint': 'This should describe the immediate context in which the Fast Streamer will be'
-                                        ' working.'},
-                'location': {'for': 'location',
-                             'label': 'Please give an address for this role',
-                             'hint': 'Please include a postcode. This might not be where the Fast Streamer will spend'
-                                     'all their time, but it will help us decide whether they\'ll need to relocate'},
-                'experience': {
-                    'heading': 'How much experience do you expect the Fast Streamer to aleady have to be efficient in '
-                               'this role?',
-                               'name': 'post-length',
-                               'values': {'0 - 6 months': 1,
-                                          '12 - 18 months': 2,
-                                          '2 years': 3,
-                                          '3 years': 4
-                                          },
-                               'for': 'Experience required',
-                    'hint': 'Remember that this is the amount of general DDaT experience, rather than experience in '
-                            'this area'
-                },
-                'ongoing': {
-                    'heading': 'Is this post a one-off, or ongoing?',
-                    'name': 'ongoing',
-                    'values': {
-                        'One-off': 'one-off',
-                        'Ongoing': 'ongoing'
-                    },
-                    'for': 'Ongoing or one-off?'
-                },
-                'start': {'for': 'Start month',
-                          'label': 'What month would you prefer the Fast Streamer start?',
-                          'hint': 'The start date will generally be 1st of the month, unless the Fast Streamer has'
-                                  ' already booked some leave.'}
+    question = {
+        'department': {
+            'for': 'Department',
+            'label': 'What department or agency is this role in?',
+            'hint': "What's your organisation generally known as?"
+        },
+        'directorate': {
+            'for': 'Directorate',
+            'label': 'Which business area or directorate is this role in?',
+            'hint': 'This should describe the team or business area in which the Fast Streamer will be working.'
+        },
+        'location': {
+            'for': 'Location',
+            'label': 'Please give an address for this role',
+            'hint': 'Please include a postcode. This might not be where the Fast Streamer will spend'
+                     'all their time, but it will help us decide whether they\'ll need to relocate'
+        },
+        'experience': {
+            'heading': 'How much experience do you expect the Fast Streamer to already have to be effective in '
+                       'this role?',
+                       'name': 'post-length',
+                       'values': {
+                           '0 - 6 months': 1,
+                           '12 - 18 months': 2,
+                           '2 years': 3,
+                           '3 years': 4
+                       },
+            'for': 'Experience required',
+            'hint': 'Remember that this is the amount of general DDaT experience, rather than experience in '
+                    'this area'
+        },
+        'ongoing': {
+            'heading': 'Is this post a one-off, or ongoing?',
+            'name': 'ongoing',
+            'values': {
+                'One-off': 'one-off',
+                'Ongoing': 'ongoing'
+            },
+            'for': 'Ongoing or one-off?'
+        },
+        'start': {
+            'for': 'Start month',
+            'label': 'What month would you prefer the Fast Streamer start?',
+            'hint': 'The start date will generally be 1st of the month, unless the Fast Streamer has already booked '
+                    'some leave.'
+        }
 
-                }
+    }
     return render_template('submit/logistical-details.html', question=question)
 
 
@@ -208,12 +219,14 @@ def security():
         'clearance': {
             'heading': 'What level of security clearance is required?',
             'name': 'security-clearance-required',
-              'values': {'Baseline Personnel Security Standard': 'BPSS',
-                         'Security Check': 'SC',
-                         'Counter-Terrorism Check': 'CTC',
-                         'Developed Vetting': 'DV',
-                         'Not applicable': 'NA'},
-              'for': 'clearance'
+            'values': {
+                'Baseline Personnel Security Standard': 'BPSS',
+                'Security Check': 'SC',
+                'Counter-Terrorism Check': 'CTC',
+                'Developed Vetting': 'DV',
+                'Not applicable': 'NA'
+            },
+            'for': 'clearance'
         },
         'nationality': {
             'for': 'nationality-restriction',
@@ -229,7 +242,12 @@ def security():
 @bp.route('/contact-details', methods=['GET', 'POST'])
 def contact_details():
     if request.method == 'POST':
-        redis.hmset('security', request.form.to_dict())
+        security_form = {'Clearance required': request.form.get('security-clearance-required')}
+        if request.form.get('nationality-restrictions') == 'yes':
+            security_form['Permitted nationalities'] = request.form.get('nationality-detail')
+        else:
+            security_form['Permitted nationalities'] = 'Any'
+        redis.hmset('security', security_form)
     question = {
         'am_email': {
             'for': 'activity-manager-email',
@@ -238,7 +256,7 @@ def contact_details():
         },
         'location': {
             'for': 'activity-manager-location',
-            'label': 'Please give an address for this role',
+            'label': 'Please give your address',
             'hint': 'Please include a postcode. We generally find that Activity Managers who are local '
                      'to their Fast Streamer get greater benefit. '
         },
@@ -246,12 +264,13 @@ def contact_details():
             'for': 'activity-manager-grade',
             'label': 'What grade will the Fast Streamer\'s Activity Manager hold?',
             'hint': 'In general we expect this to be a Grade 7 or equivalent for trainees with less than two years '
-                    'experience, and a Grade 6 or equivalent for those with more'
+                    'experience, and a Grade 6 or equivalent for those with more.'
         },
         'grade_manager': {
             'for': 'grade-manager-email',
             'label': 'Please give the grade manager\'s email address',
-            'hint': "We'll email a copy of this completed form to that address"
+            'hint': "Your grade manager is the person in your department responsible for coordinating Fast Streamers. "
+                    "We'll send them a copy of this completed form."
         }
     }
     return render_template('submit/contact-details.html', question=question)
