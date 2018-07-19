@@ -116,6 +116,7 @@ def skills():
         redis.set(prior_role.name, skill_dump(request.form))
         redis.rpush('skills', prior_role.name)
     current_role = roles_in_family[seen_roles]
+    redis.incr('roles_seen', 1)  # increment the number of roles seen
     name = current_role.name
     r = {
         'title': name,
@@ -277,6 +278,7 @@ def contact_details():
 
 @bp.route('/confirm-role-details', methods=['GET', 'POST'])
 def confirm_role_details():
+    redis.set('roles_seen', 0)
     if request.method == 'POST':
         redis.hmset('contact', request.form.to_dict())
     data = {
