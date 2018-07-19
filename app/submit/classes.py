@@ -17,7 +17,7 @@ class Family:
 def skill_dump(form) -> str:
     skills = {
         'Skills gained': ' | '.join(form.getlist('skills')),
-        'Overall level attained': form['skill-level'],
-        'How gained': form['skills-describe']
+        'Overall level attained': form.get('skill-level'),
+        'How gained': form.get('skills-describe')
     }
     return json.dumps(skills)
