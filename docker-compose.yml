@@ -3,12 +3,6 @@ services:
   web:
     build: .
     restart: always
-    environment:
-      - FLASK_DEBUG=1
-      - ENV=test
-    command: ["flask", "run", "--host=0.0.0.0"]
-    volumes:
-      - ./app:/home/submit-fast-stream-post/app
     ports:
       - "5000:5000"
     depends_on:

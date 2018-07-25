@@ -75,17 +75,17 @@ def skills():
                             'Technical understanding (data engineering)': 'Technical understanding (data engineering)',
                             'Testing': 'Testing'
                         })
-    r2 = RoleQuestion('Data Engineer Mk 2', {
-                            'Data analysis and synthesis': 'Data analysis and synthesis',
-                            'Communicating between the technical and the non-technical'
-                            : 'Communicating between the technical and the non-technical',
-                            'Data development process': 'Data development process',
-                            'Data integration design': 'Data integration design',
-                            'Data modelling': 'Data modelling',
-                            'Programming and build (data engineering)': 'Programming and build (data engineering)',
-                            'Technical understanding (data engineering)': 'Technical understanding (data engineering)',
-                            'Testing': 'Testing'
-                        })
+    r2 = RoleQuestion('Data Scientist', {
+        'Applied maths, statistics and scientific practices': 1005,
+        'Data engineering and manipulation': 1034,
+        'Data science innovation': 1039,
+        'Developing data science capability': 1043,
+        'Domain expertise': 1047,
+        'Programming and build (data science)': 1084,
+        'Understanding analysis across the life cycle (data science)': 1126
+    }
+
+                            )
     r3 = RoleQuestion('Strategy and Policy', {
                             'Drafting': 'Drafting',
                             'Briefing': 'Briefing',
