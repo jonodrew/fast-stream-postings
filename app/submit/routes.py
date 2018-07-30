@@ -2,14 +2,14 @@ from flask import render_template, redirect, url_for, session, request
 from app.submit.classes import RoleQuestion, skill_dump
 from app import db
 from app.submit import bp
-from app import redis
+from app import redis_store
 from redis import ResponseError
 import json
 
 
 @bp.route('/start', methods=['GET', 'POST'])
 def start():
-    redis.flushall()
+    redis_store.flushall()
     return render_template('submit/start.html', title='Submit a Fast Stream role')
 
 
@@ -17,7 +17,7 @@ def start():
 def role_details():
     if request.method == 'POST':
         details = request.form.to_dict()
-        redis.hmset('role', details)
+        redis_store.hmset('role', details)
         return redirect(url_for('submit.role_family'))
     question = {
         'textarea': {
@@ -43,7 +43,7 @@ def role_details():
 @bp.route('/role-family', methods=['POST', 'GET'])
 def role_family():
     if request.method == 'POST':
-        redis.set('family', request.form['ddat-job-family'])
+        redis_store.set('family', request.form['ddat-job-family'])
         return redirect(url_for('submit.skills'))
     question = {
         'family': {
@@ -58,7 +58,7 @@ def role_family():
             'for': 'DDaT job family'
         }
     }
-    redis.set('roles_seen', 0)
+    redis_store.set('roles_seen', 0)
     return render_template('submit/role-family.html', question=question)
 
 
@@ -109,14 +109,14 @@ def skills():
     families = {
         'data': [r, r2, r3, r4]
         }
-    roles_in_family = families[redis.get('family')]
-    seen_roles = int(redis.get('roles_seen'))
+    roles_in_family = families[redis_store.get('family')]
+    seen_roles = int(redis_store.get('roles_seen'))
     if request.method == 'POST':  # user has clicked 'continue'
         prior_role = roles_in_family[seen_roles-1]
-        redis.set(prior_role.name, skill_dump(request.form))
-        redis.rpush('skills', prior_role.name)
+        redis_store.set(prior_role.name, skill_dump(request.form))
+        redis_store.rpush('skills', prior_role.name)
     current_role = roles_in_family[seen_roles]
-    redis.incr('roles_seen', 1)  # increment the number of roles seen
+    redis_store.incr('roles_seen', 1)  # increment the number of roles seen
     name = current_role.name
     r = {
         'title': name,
@@ -157,8 +157,8 @@ def skills():
 def logistical_details():
     if request.method == 'POST':
         prior_role = 'Generalist skills'
-        redis.set(prior_role, skill_dump(request.form))
-        redis.rpush(skills, prior_role)
+        redis_store.set(prior_role, skill_dump(request.form))
+        redis_store.rpush(skills, prior_role)
     question = {
         'department': {
             'for': 'Department',
@@ -213,7 +213,7 @@ def logistical_details():
 @bp.route('security', methods=['POST', 'GET'])
 def security():
     if request.method == 'POST':
-        redis.hmset('logistics', request.form.to_dict())
+        redis_store.hmset('logistics', request.form.to_dict())
     question = {
         'clearance': {
             'heading': 'What level of security clearance is required?',
@@ -246,7 +246,7 @@ def contact_details():
             security_form['Permitted nationalities'] = request.form.get('nationality-detail')
         else:
             security_form['Permitted nationalities'] = 'Any'
-        redis.hmset('security', security_form)
+        redis_store.hmset('security', security_form)
     question = {
         'am_email': {
             'for': 'activity-manager-email',
@@ -277,27 +277,27 @@ def contact_details():
 
 @bp.route('/confirm-role-details', methods=['GET', 'POST'])
 def confirm_role_details():
-    redis.set('roles_seen', 0)
+    redis_store.set('roles_seen', 0)
     if request.method == 'POST':
-        redis.hmset('contact', request.form.to_dict())
+        redis_store.hmset('contact', request.form.to_dict())
     data = {
         'role': {
             'caption': 'Role details',
-            'row_data': redis.hgetall('role')
+            'row_data': redis_store.hgetall('role')
         },
         'logistics': {
             'caption': 'Logistical details',
-            'row_data': redis.hgetall('logistics')
+            'row_data': redis_store.hgetall('logistics')
         },
         'security': {
             'caption': 'Security details',
-            'row_data': redis.hgetall('security')
+            'row_data': redis_store.hgetall('security')
         }
     }
-    skills = redis.lrange('skills', 0, -1)
+    skills = redis_store.lrange('skills', 0, -1)
     for s in skills:
         skill_data = {
-            'row_data': json.loads(redis.get(s)),
+            'row_data': json.loads(redis_store.get(s)),
             'caption': s
         }
         data[s] = skill_data
