@@ -18,4 +18,4 @@ If you're using Windows, you may experience [this issue](https://github.com/jono
 
 Then delete the folder you downloaded and re-clone it. Once that's done, run `docker-compose up --build`. If that doesn't work, raise an issue and I'll try to help as soon as I can.
 
-When running on Windows 10,  you may experience [this issue](https://github.com/jonodrew/fast-stream-postings/issues/20)started if ended. If this affects you, simply toggle-apply your Docker shared folder off and on in Docker settings as here: ![image](https://user-images.githubusercontent.com/28785439/43518728-dd689ed0-9584-11e8-87ea-824843e446e4.png)
+When running on Windows 10, docker version 18.06.0-ce  you may experience [this issue](https://github.com/jonodrew/fast-stream-postings/issues/20) when restarting the program after a termination. If this affects you, simply toggle-apply your Docker shared folder off and on in Docker settings as here: ![image](https://user-images.githubusercontent.com/28785439/43518728-dd689ed0-9584-11e8-87ea-824843e446e4.png)
