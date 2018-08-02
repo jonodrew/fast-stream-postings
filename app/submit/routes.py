@@ -2,14 +2,14 @@ from flask import render_template, redirect, url_for, session, request
 from app.submit.classes import RoleQuestion, skill_dump
 from app import db
 from app.submit import bp
-from app import redis
+from app import redis_store
 from redis import ResponseError
 import json
 
 
 @bp.route('/start', methods=['GET', 'POST'])
 def start():
-    redis.flushall()
+    redis_store.flushall()
     return render_template('submit/start.html', title='Submit a Fast Stream role')
 
 
@@ -17,7 +17,7 @@ def start():
 def role_details():
     if request.method == 'POST':
         details = request.form.to_dict()
-        redis.hmset('role', details)
+        redis_store.hmset('role', details)
         return redirect(url_for('submit.role_family'))
     question = {
         'textarea': {
@@ -43,7 +43,7 @@ def role_details():
 @bp.route('/role-family', methods=['POST', 'GET'])
 def role_family():
     if request.method == 'POST':
-        redis.set('family', request.form['ddat-job-family'])
+        redis_store.set('family', request.form['ddat-job-family'])
         return redirect(url_for('submit.skills'))
     question = {
         'family': {
@@ -58,7 +58,7 @@ def role_family():
             'for': 'DDaT job family'
         }
     }
-    redis.set('roles_seen', 0)
+    redis_store.set('roles_seen', 0)
     return render_template('submit/role-family.html', question=question)
 
 
@@ -75,17 +75,17 @@ def skills():
                             'Technical understanding (data engineering)': 'Technical understanding (data engineering)',
                             'Testing': 'Testing'
                         })
-    r2 = RoleQuestion('Data Engineer Mk 2', {
-                            'Data analysis and synthesis': 'Data analysis and synthesis',
-                            'Communicating between the technical and the non-technical'
-                            : 'Communicating between the technical and the non-technical',
-                            'Data development process': 'Data development process',
-                            'Data integration design': 'Data integration design',
-                            'Data modelling': 'Data modelling',
-                            'Programming and build (data engineering)': 'Programming and build (data engineering)',
-                            'Technical understanding (data engineering)': 'Technical understanding (data engineering)',
-                            'Testing': 'Testing'
-                        })
+    r2 = RoleQuestion('Data Scientist', {
+        'Applied maths, statistics and scientific practices': 1005,
+        'Data engineering and manipulation': 1034,
+        'Data science innovation': 1039,
+        'Developing data science capability': 1043,
+        'Domain expertise': 1047,
+        'Programming and build (data science)': 1084,
+        'Understanding analysis across the life cycle (data science)': 1126
+    }
+
+                            )
     r3 = RoleQuestion('Strategy and Policy', {
                             'Drafting': 'Drafting',
                             'Briefing': 'Briefing',
@@ -109,17 +109,14 @@ def skills():
     families = {
         'data': [r, r2, r3, r4]
         }
-    roles_in_family = families[redis.get('family')]
-    next_step = 'submit.skills'
-    if request.method == 'POST':  # user has clicked 'complete'
-        prior_role = roles_in_family[int(redis.get('roles_seen')) - 1]
-        redis.set(prior_role.name, skill_dump(request.form))
-        redis.rpush('skills', prior_role.name)
-        if int(redis.get('roles_seen')) == len(roles_in_family) - 1:
-            next_step = 'submit.logistical_details'
-    seen_roles = int(redis.get('roles_seen'))
+    roles_in_family = families[redis_store.get('family')]
+    seen_roles = int(redis_store.get('roles_seen'))
+    if request.method == 'POST':  # user has clicked 'continue'
+        prior_role = roles_in_family[seen_roles-1]
+        redis_store.set(prior_role.name, skill_dump(request.form))
+        redis_store.rpush('skills', prior_role.name)
     current_role = roles_in_family[seen_roles]
-    redis.incr('roles_seen', 1)  # increment the number of roles seen
+    redis_store.incr('roles_seen', 1)  # increment the number of roles seen
     name = current_role.name
     r = {
         'title': name,
@@ -149,71 +146,86 @@ def skills():
                     "have at the end of this post?"
         }
     }
-    return render_template('submit/skills.html', role=r, next_step=next_step, seen_roles=seen_roles)
+    if seen_roles == len(roles_in_family) - 1:
+        next_step = 'submit.logistical_details'
+    else:
+        next_step = 'submit.skills'
+    return render_template('submit/skills.html', role=r, next_step=next_step)
 
 
 @bp.route('/logistical-details', methods=['POST', 'GET'])
 def logistical_details():
     if request.method == 'POST':
         prior_role = 'Generalist skills'
-        redis.set(prior_role, skill_dump(request.form))
-        redis.rpush(skills, prior_role)
-    question = {'department': {'for': 'department',
-                               'label': 'What department or agency is this role in?',
-                               'hint': "What's your organisation generally known as?"},
-                'directorate': {'for': 'directorate',
-                                'label': 'Which business area or directorate is this role in?',
-                                'hint': 'This should describe the immediate context in which the Fast Streamer will be'
-                                        ' working.'},
-                'location': {'for': 'location',
-                             'label': 'Please give an address for this role',
-                             'hint': 'Please include a postcode. This might not be where the Fast Streamer will spend'
-                                     'all their time, but it will help us decide whether they\'ll need to relocate'},
-                'experience': {
-                    'heading': 'How much experience do you expect the Fast Streamer to aleady have to be efficient in '
-                               'this role?',
-                               'name': 'post-length',
-                               'values': {'0 - 6 months': 1,
-                                          '12 - 18 months': 2,
-                                          '2 years': 3,
-                                          '3 years': 4
-                                          },
-                               'for': 'Experience required',
-                    'hint': 'Remember that this is the amount of general DDaT experience, rather than experience in '
-                            'this area'
-                },
-                'ongoing': {
-                    'heading': 'Is this post a one-off, or ongoing?',
-                    'name': 'ongoing',
-                    'values': {
-                        'One-off': 'one-off',
-                        'Ongoing': 'ongoing'
-                    },
-                    'for': 'Ongoing or one-off?'
-                },
-                'start': {'for': 'Start month',
-                          'label': 'What month would you prefer the Fast Streamer start?',
-                          'hint': 'The start date will generally be 1st of the month, unless the Fast Streamer has'
-                                  ' already booked some leave.'}
+        redis_store.set(prior_role, skill_dump(request.form))
+        redis_store.rpush(skills, prior_role)
+    question = {
+        'department': {
+            'for': 'Department',
+            'label': 'What department or agency is this role in?',
+            'hint': "What's your organisation generally known as?"
+        },
+        'directorate': {
+            'for': 'Directorate',
+            'label': 'Which business area or directorate is this role in?',
+            'hint': 'This should describe the team or business area in which the Fast Streamer will be working.'
+        },
+        'location': {
+            'for': 'Location',
+            'label': 'Please give an address for this role',
+            'hint': 'Please include a postcode. This might not be where the Fast Streamer will spend'
+                     'all their time, but it will help us decide whether they\'ll need to relocate'
+        },
+        'experience': {
+            'heading': 'How much experience do you expect the Fast Streamer to already have to be effective in '
+                       'this role?',
+                       'name': 'post-length',
+                       'values': {
+                           '0 - 6 months': 1,
+                           '12 - 18 months': 2,
+                           '2 years': 3,
+                           '3 years': 4
+                       },
+            'for': 'Experience required',
+            'hint': 'Remember that this is the amount of general DDaT experience, rather than experience in '
+                    'this area'
+        },
+        'ongoing': {
+            'heading': 'Is this post a one-off, or ongoing?',
+            'name': 'ongoing',
+            'values': {
+                'One-off': 'one-off',
+                'Ongoing': 'ongoing'
+            },
+            'for': 'Ongoing or one-off?'
+        },
+        'start': {
+            'for': 'Start month',
+            'label': 'What month would you prefer the Fast Streamer start?',
+            'hint': 'The start date will generally be 1st of the month, unless the Fast Streamer has already booked '
+                    'some leave.'
+        }
 
-                }
+    }
     return render_template('submit/logistical-details.html', question=question)
 
 
 @bp.route('security', methods=['POST', 'GET'])
 def security():
     if request.method == 'POST':
-        redis.hmset('logistics', request.form.to_dict())
+        redis_store.hmset('logistics', request.form.to_dict())
     question = {
         'clearance': {
             'heading': 'What level of security clearance is required?',
             'name': 'security-clearance-required',
-              'values': {'Baseline Personnel Security Standard': 'BPSS',
-                         'Security Check': 'SC',
-                         'Counter-Terrorism Check': 'CTC',
-                         'Developed Vetting': 'DV',
-                         'Not applicable': 'NA'},
-              'for': 'clearance'
+            'values': {
+                'Baseline Personnel Security Standard': 'BPSS',
+                'Security Check': 'SC',
+                'Counter-Terrorism Check': 'CTC',
+                'Developed Vetting': 'DV',
+                'Not applicable': 'NA'
+            },
+            'for': 'clearance'
         },
         'nationality': {
             'for': 'nationality-restriction',
@@ -229,7 +241,12 @@ def security():
 @bp.route('/contact-details', methods=['GET', 'POST'])
 def contact_details():
     if request.method == 'POST':
-        redis.hmset('security', request.form.to_dict())
+        security_form = {'Clearance required': request.form.get('security-clearance-required')}
+        if request.form.get('nationality-restrictions') == 'yes':
+            security_form['Permitted nationalities'] = request.form.get('nationality-detail')
+        else:
+            security_form['Permitted nationalities'] = 'Any'
+        redis_store.hmset('security', security_form)
     question = {
         'am_email': {
             'for': 'activity-manager-email',
@@ -238,7 +255,7 @@ def contact_details():
         },
         'location': {
             'for': 'activity-manager-location',
-            'label': 'Please give an address for this role',
+            'label': 'Please give your address',
             'hint': 'Please include a postcode. We generally find that Activity Managers who are local '
                      'to their Fast Streamer get greater benefit. '
         },
@@ -246,12 +263,13 @@ def contact_details():
             'for': 'activity-manager-grade',
             'label': 'What grade will the Fast Streamer\'s Activity Manager hold?',
             'hint': 'In general we expect this to be a Grade 7 or equivalent for trainees with less than two years '
-                    'experience, and a Grade 6 or equivalent for those with more'
+                    'experience, and a Grade 6 or equivalent for those with more.'
         },
         'grade_manager': {
             'for': 'grade-manager-email',
             'label': 'Please give the grade manager\'s email address',
-            'hint': "We'll email a copy of this completed form to that address"
+            'hint': "Your grade manager is the person in your department responsible for coordinating Fast Streamers. "
+                    "We'll send them a copy of this completed form."
         }
     }
     return render_template('submit/contact-details.html', question=question)
@@ -259,27 +277,27 @@ def contact_details():
 
 @bp.route('/confirm-role-details', methods=['GET', 'POST'])
 def confirm_role_details():
-    redis.set('roles_seen', 0)
+    redis_store.set('roles_seen', 0)
     if request.method == 'POST':
-        redis.hmset('contact', request.form.to_dict())
+        redis_store.hmset('contact', request.form.to_dict())
     data = {
         'role': {
             'caption': 'Role details',
-            'row_data': redis.hgetall('role')
+            'row_data': redis_store.hgetall('role')
         },
         'logistics': {
             'caption': 'Logistical details',
-            'row_data': redis.hgetall('logistics')
+            'row_data': redis_store.hgetall('logistics')
         },
         'security': {
             'caption': 'Security details',
-            'row_data': redis.hgetall('security')
+            'row_data': redis_store.hgetall('security')
         }
     }
-    skills = redis.lrange('skills', 0, -1)
+    skills = redis_store.lrange('skills', 0, -1)
     for s in skills:
         skill_data = {
-            'row_data': json.loads(redis.get(s)),
+            'row_data': json.loads(redis_store.get(s)),
             'caption': s
         }
         data[s] = skill_data

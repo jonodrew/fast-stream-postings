@@ -2,12 +2,11 @@ from flask import Flask, url_for
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 from flask_migrate import Migrate
-from redis import StrictRedis
 from flask_redis import FlaskRedis
 
 db = SQLAlchemy()
 migrate = Migrate()
-redis = StrictRedis(host='redis', port=6379, charset="utf-8", decode_responses=True)
+redis_store = FlaskRedis()
 
 
 def create_app(config_class=Config) -> Flask:
@@ -16,6 +15,7 @@ def create_app(config_class=Config) -> Flask:
     db.init_app(app)
     migrate.init_app(app, db)
     app.config['ASSETS_DEBUG'] = True
+    redis_store.init_app(app, charset='utf-8', decode_responses=True)
 
     """these are blueprints - a way of making a Flask application more modular and re-usable"""
     from app.errors import bp as errors_bp
