@@ -1,6 +1,6 @@
 # Submit a Fast Stream Post
 
-##Try it out
+## Try it out
 [This prototype is available to try](https://fast-stream-postings.herokuapp.com/). Please only select `Data` from the `Job family` page. This may break at any point; if they do, raise an issue here.
 
 ## Build
