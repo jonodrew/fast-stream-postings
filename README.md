@@ -1,5 +1,8 @@
 # Submit a Fast Stream Post
 
+##Try it out
+[This prototype is available to try](https://fast-stream-postings.herokuapp.com/). Please only select `Data` from the `Job family` page. This may break at any point; if they do, raise an issue here.
+
 ## Build
 This service is built in Flask. It comprises three containers: a Redis container for storing session data, a Postgres
 container for persisting data, and a Python container to run the Flask web server.
