@@ -21,3 +21,5 @@ style==1.1.5
 update==0.0.1
 webassets==0.12.1
 Werkzeug==0.14.1
+
+git+https://github.com/alphagov/digitalmarketplace-apiclient.git@19.0.0#egg=digitalmarketplace-apiclient==19.0.0
