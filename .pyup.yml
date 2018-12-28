@@ -1,0 +1,4 @@
+search: False
+
+requirements:
+  - requirements-dev.txt
