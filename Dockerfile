@@ -6,6 +6,7 @@ RUN python -m venv venv
 RUN pip install -r requirements.txt
 COPY app app
 COPY migrations migrations
+COPY helpers helpers
 COPY config.py postings.py deploy.sh ./
 RUN chmod +x deploy.sh
 ENV FLASK_APP postings.py
