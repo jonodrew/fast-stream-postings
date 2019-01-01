@@ -1,10 +1,19 @@
-from flask import render_template, redirect, url_for, session, request
+from flask import render_template, redirect, url_for, session, request, abort
 from app.submit.classes import RoleQuestion, skill_dump
 from app import db
 from app.submit import bp
 from app import redis_store
 from redis import ResponseError
 import json
+
+
+@bp.before_request
+def load_logged_in_user():
+    user_id = session.get('user_id')
+    if user_id is None:
+        return abort(404)
+    else:
+        pass
 
 
 @bp.route('/start', methods=['GET', 'POST'])
