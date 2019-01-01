@@ -15,7 +15,7 @@
 
   <meta name="robots" content="noindex, nofollow">
   <!--[if !IE 8]><!-->
-    <link href="{{ url_for('static', filename='css/all.css') }}" rel="stylesheet" media="all" />
+    <link href="{{ url_for('static', filename='main.css') }}" rel="stylesheet" media="all" />
   <!--<![endif]-->
   <!--[if lt IE 9]>
     <link href="/stylesheets/main-ie8-93477b02ea3d2d6b02a1992d8b09c27f.css" rel="stylesheet" media="all" />
@@ -35,18 +35,18 @@
 {% include '_header.html' %}
 
         <div class="govuk-width-container">
-        {% include '_phase-banner.html' %}
-        <a href="#" class="govuk-back-link">Back</a>
-        {% block content %}
-        
-        {% endblock %}
+            {% include '_phase-banner.html' %}
+            <a href="#" class="govuk-back-link">Back</a>
+            {% block content %}
+
+            {% endblock %}
 
       </div>
 
     {% include '_footer.html' %}
 
 
-  <script src="{{ url_for('static', filename="javascript/govuk-frontend-1.0.0.min.js") }}"></script>
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
   <script>window.GOVUKFrontend.initAll()</script>
   </body>
 </html>
