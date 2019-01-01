@@ -5,6 +5,7 @@ from app.submit import bp
 from app import redis_store
 from redis import ResponseError
 import json
+import helpers.registers_helpers
 
 
 @bp.before_request
@@ -27,25 +28,22 @@ def role_details():
     if request.method == 'POST':
         details = request.form.to_dict()
         redis_store.hmset('role', details)
-        return redirect(url_for('submit.role_family'))
+        return redirect(url_for('submit.skills'))
     question = {
         'textarea': {
             'label': 'Role description',
-                             'hint': "Please give a description of the role and some context. For example, what "
-                                     "are the team's priorities?",
-                             'for': 'Description'
+            'hint': "Please give a description of the role and some context. For example, what are the team's priorities?",
+            'for': 'Description'
         },
         'role_title': {
-            'for': 'Title',
-            'label': 'Role title',
-            'hint': "For preference, this should be one of the 37 "
-                    "<a href='https://www.gov.uk/government/collections/digital-data-and-technology-profession-capability-framework'> "
-                    "DDaT roles"
-                       },
-                'responsibilities': {'for': 'Key responsibilities',
-                                     'label': 'Main responsibilities and deliverables of post',
-                                     'hint': "We'll use this to decide if the role has sufficient stretch"}
-                }
+            'heading': "Which of these titles best describes the role?",
+            'name': 'ddat-role-title',
+            'values': helpers.registers_helpers.get_unique_jobs_in_job_family(redis_store.get('family')),            'for': 'DDaT role title'
+        },
+        'responsibilities': {'for': 'Key responsibilities',
+                             'label': 'Main responsibilities and deliverables of post',
+                             'hint': "We'll use this to decide if the role has sufficient stretch"}
+        }
     return render_template('submit/role-details.html', title='Role details', question=question)
 
 
@@ -53,17 +51,13 @@ def role_details():
 def role_family():
     if request.method == 'POST':
         redis_store.set('family', request.form['ddat-job-family'])
-        return redirect(url_for('submit.skills'))
+        return redirect(url_for('submit.role_details'))
+
     question = {
         'family': {
             'heading': 'In which job family does this role sit?',
             'name': 'ddat-job-family',
-            'values': {'Data': 'data',
-                      'IT Operations': 'ITOps',
-                      'Product and delivery': 'PD',
-                      'Quality Assurance Testing': 'QAT',
-                      'Technical': 'technical',
-                      'User-centred design': 'UCD'},
+            'values': helpers.registers_helpers.ddat_job_families(),
             'for': 'DDaT job family'
         }
     }
@@ -116,7 +110,7 @@ def skills():
 
                         })
     families = {
-        'data': [r, r2, r3, r4]
+        '105': [r, r2, r3, r4]
         }
     roles_in_family = families[redis_store.get('family')]
     seen_roles = int(redis_store.get('roles_seen'))

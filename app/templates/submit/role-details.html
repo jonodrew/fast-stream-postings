@@ -9,7 +9,7 @@
         <form method="post">
             <div class="govuk-form-group">
                 {% set question_data = question.role_title %}
-                {% include '_text_input.html' %}
+                {% include '_radio.html' %}
                 {% set question_data = question.textarea %}
                 {% include '_textarea.html' %}
                 {% set question_data = question.responsibilities %}
