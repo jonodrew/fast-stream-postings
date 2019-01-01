@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    <div class="govuk-main-wrapper">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">Please login</h1>
+          <p class="govuk-body-l">
+              The service you're trying to access is a prototype. We've put it behind this login page to ensure that
+              users who find this service by accident don't use it.
+          </p>
+        <form method="post" action="{{ url_for('auth.login') }}">
+            {% for question in questions %}
+                {% for key, value in question.items() %}
+                    {% set question_data = value %}
+                    {% include '_text_input.html' %}
+                {% endfor %}
+            {% endfor %}
+    <div class="govuk-form-group">
+
+    </div>
+        <button type="submit" class="govuk-button">
+  Continue
+</button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+{% endblock %}
