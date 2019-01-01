@@ -26,9 +26,8 @@ def create_app(config_class=Config) -> Flask:
     from app.submit import bp as submit_bp
     app.register_blueprint(submit_bp, url_prefix='/submit')
 
-    print(app.static_folder)
-    print(app.static_url_path)
-
+    from app.auth import bp as auth_bp
+    app.register_blueprint(auth_bp, url_prefix='/auth')
 
     return app
 

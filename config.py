@@ -10,6 +10,7 @@ class Config(object):
     REGISTERS_API_KEY = os.environ.get('REGISTERS_KEY')
     REDIS_URL = os.environ.get('REDIS_URL') or "redis://redis:6379"
     STATIC_FOLDER = "/static"
+    SECRET_KEY = os.environ.get('SECRET_KEY') or secrets.token_hex(128)
 
 
 class Test(Config):
