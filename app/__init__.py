@@ -15,6 +15,8 @@ def create_app(config_class=Config) -> Flask:
     db.init_app(app)
     migrate.init_app(app, db)
     app.config['ASSETS_DEBUG'] = True
+    app.static_url_path = app.config.get('STATIC_FOLDER')
+    app.static_folder = app.root_path + app.static_url_path
     redis_store.init_app(app, charset='utf-8', decode_responses=True)
 
     """these are blueprints - a way of making a Flask application more modular and re-usable"""
@@ -23,6 +25,9 @@ def create_app(config_class=Config) -> Flask:
 
     from app.submit import bp as submit_bp
     app.register_blueprint(submit_bp, url_prefix='/submit')
+
+    print(app.static_folder)
+    print(app.static_url_path)
 
 
     return app

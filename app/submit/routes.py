@@ -9,7 +9,7 @@ import json
 
 @bp.route('/start', methods=['GET', 'POST'])
 def start():
-    # redis_store.flushall()
+    redis_store.flushall()
     return render_template('submit/start.html', title='Submit a Fast Stream role')
 
 

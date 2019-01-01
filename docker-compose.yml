@@ -25,3 +25,8 @@ services:
 
 volumes:
   pgdata:
+
+networks:
+  default:
+    external:
+      name: your-network

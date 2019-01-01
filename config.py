@@ -9,6 +9,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     REGISTERS_API_KEY = os.environ.get('REGISTERS_KEY')
     REDIS_URL = os.environ.get('REDIS_URL') or "redis://redis:6379"
+    STATIC_FOLDER = "/static"
 
 
 class Test(Config):
