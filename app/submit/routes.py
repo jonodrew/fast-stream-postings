@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, session, request, abort
+from flask import render_template, redirect, url_for, session, request
 from app.submit.classes import RoleQuestion, skill_dump
 from app import db
 from app.submit import bp
