@@ -2,7 +2,7 @@ gunicorn==20.0.4
 itsdangerous==1.1.0
 Jinja2==2.11.2
 Mako==1.1.3
-MarkupSafe==1.1.0
+MarkupSafe==1.1.1
 psycopg2==2.8.5
 pyScss==1.3.7
 python-dateutil==2.8.1
