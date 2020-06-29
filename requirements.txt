@@ -8,7 +8,7 @@ pyScss==1.3.7
 python-dateutil==2.8.1
 python-editor==1.0.3
 redis==3.5.3
-six==1.11.0
+six==1.15.0
 SQLAlchemy==1.3.16
 style==1.1.6
 update==0.0.1
