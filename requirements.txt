@@ -9,7 +9,7 @@ python-dateutil==2.8.1
 python-editor==1.0.4
 redis==3.5.3
 six==1.15.0
-SQLAlchemy==1.4.9
+SQLAlchemy==1.4.11
 style==1.1.6
 update==0.0.1
 webassets==0.12.1
