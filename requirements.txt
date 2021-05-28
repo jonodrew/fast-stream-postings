@@ -18,7 +18,7 @@ alembic==1.6.5
 click==6.7
 Flask==1.1.2
 Flask-Assets==0.12
-Flask-Migrate==2.7.0
+Flask-Migrate==3.0.0
 Flask-Redis==0.4.0
 Flask-SQLAlchemy==2.5.1
 
