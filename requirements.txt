@@ -12,7 +12,7 @@ six==1.16.0
 SQLAlchemy==1.4.22
 style==1.1.6
 update==0.0.1
-webassets==0.12.1
+webassets==2.0
 Werkzeug==0.15.3
 alembic==1.6.5
 click==6.7
